@@ -1,4 +1,6 @@
-export const COMMANDS = [
+import { TCommandItem } from '#types';
+
+export const COMMANDS: TCommandItem[] = [
   {
     name: 'ping',
     description: 'Replies with Pong!',
@@ -32,3 +34,18 @@ export const COMMANDS = [
     description: 'Отправляет сообщение',
   },
 ];
+
+export enum ERRORS {
+  SHOW_PLAYERS_ERROR = 'Ошибка при показе игроков',
+  SEND_MESSAGE_ERROR = 'Ошибка при отправке сообщения',
+}
+
+export enum SUCCESS_MESSAGES {
+  SEND_MESSAGE_SUCCESS = 'Сообщение успешно отправлено',
+}
+
+export enum COMMANDS_NAMES {
+  PING = 'ping',
+  PLAYERS = 'players',
+  MESSAGE = 'message',
+}

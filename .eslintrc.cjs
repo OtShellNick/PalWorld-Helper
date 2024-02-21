@@ -1,4 +1,4 @@
-// .eslintrc.js
+// .eslintrc.cjs
 module.exports = {
     parser: '@typescript-eslint/parser', // Определяет парсер ESLint для TypeScript
     extends: [

@@ -1,14 +1,12 @@
 import net from 'net';
 import { randomInt } from 'crypto';
 import { Buffer } from 'node:buffer';
+import { TBaseRecord } from '#types';
 import { configDotenv } from 'dotenv';
 
 configDotenv();
 
-const { RCON_HOST, RCON_PORT, ADMIN_PASSWORD } = process.env as Record<
-  string,
-  string
->;
+const { RCON_HOST, RCON_PORT, ADMIN_PASSWORD } = process.env as TBaseRecord;
 
 interface RCONClientOptions {
   host: string;

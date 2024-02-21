@@ -1,9 +1,9 @@
-import { Client, GatewayIntentBits } from 'discord.js';
 import { log } from '#helpers';
-import { PalRCONClient } from '#config/rcon.ts';
+import { COMMANDS_NAMES } from '#const';
+import { Client, GatewayIntentBits } from 'discord.js';
+import { messageHandler, pingHandler, playersHandler } from '#handlers';
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-const rcon = new PalRCONClient();
 
 export const initClient = async (token: string) => {
   client.on('ready', () => {
@@ -13,26 +13,20 @@ export const initClient = async (token: string) => {
   client.on('interactionCreate', async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
 
-    if (interaction.commandName === 'test') {
-      await interaction.reply('Pong!');
-    }
+    const { commandName } = interaction;
 
-    if (interaction.commandName === 'players') {
-      try {
-        const resp = await rcon.ShowPlayers();
-        await interaction.reply(resp);
-      } catch (error) {
-        log(error);
-      }
-    }
-
-    if (interaction.commandName === 'message') {
-      try {
-        await rcon.Broadcast('test messge');
-        await interaction.reply('Сообщение успешно отправлено');
-      } catch (error) {
-        await interaction.reply('При отправке сообщение произошла ошибка');
-      }
+    switch (commandName) {
+      case COMMANDS_NAMES.PING:
+        await pingHandler(interaction);
+        break;
+      case COMMANDS_NAMES.PLAYERS:
+        await playersHandler(interaction);
+        break;
+      case COMMANDS_NAMES.MESSAGE:
+        await messageHandler(interaction, 'message');
+        break;
+      default:
+        break;
     }
   });
 

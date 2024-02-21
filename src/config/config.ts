@@ -1,6 +1,6 @@
+import { COMMANDS } from '#const';
 import { log, error } from '#helpers';
 import { REST, Routes } from 'discord.js';
-import { COMMANDS } from '#const/index.ts';
 
 export const initConfig = async (token: string, clientId: string) => {
   const rest = new REST({ version: '10' }).setToken(token);

@@ -10,7 +10,7 @@
   },
   "imports": {
     "#const": [
-      "./src/const/*"
+      "./src/const/index.ts"
     ],
     "#config": [
       "./src/config/*"
@@ -21,6 +21,12 @@
     ],
     "#helpers": [
       "./src/helpers/index.ts"
+    ],
+    "#types": [
+      "./src/types/index.ts"
+    ],
+    "#handlers": [
+      "./src/handlers/index.ts"
     ]
   },
   "keywords": [],
