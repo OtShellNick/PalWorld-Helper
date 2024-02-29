@@ -4,3 +4,9 @@ export type TCommandItem = {
 };
 
 export type TBaseRecord = Record<string, string>;
+
+export type TPlayerInfo = {
+  name: string;
+  playeruid: string;
+  steamid: string;
+};

@@ -6,12 +6,24 @@ import { ERRORS, SUCCESS_MESSAGES } from '#const';
 
 const rcon = new PalRCONClient();
 
+/**
+ * Обработчик команды "ping" для интерактивной команды Discord.
+ * Отвечает сообщением "Pong!".
+ * @param {CommandInteraction} interaction - Объект взаимодействия команды Discord.
+ */
 export const pingHandler = async (
   interaction: CommandInteraction,
 ): Promise<void> => {
   await interaction.reply('Pong!');
 };
 
+/**
+ * Обработчик команды "players" для интерактивной команды Discord.
+ * Получает информацию о текущих игроках с сервера RCON и отправляет её
+ * в Discord в виде встраиваемых элементов (embeds).
+ * Если игроки не найдены, отправляет соответствующее сообщение.
+ * @param {CommandInteraction} interaction - Объект взаимодействия команды Discord.
+ */
 export const playersHandler = async (
   interaction: CommandInteraction,
 ): Promise<void> => {
@@ -32,6 +44,13 @@ export const playersHandler = async (
   }
 };
 
+/**
+ * Обработчик команды "message" для интерактивной команды Discord.
+ * Отправляет сообщение на RCON-сервер, чтобы транслировать его всем игрокам.
+ * При успешной отправке сообщает об этом в Discord.
+ * @param {CommandInteraction} interaction - Объект взаимодействия команды Discord.
+ * @param {string} message - Сообщение для трансляции через RCON-сервер.
+ */
 export const messageHandler = async (
   interaction: CommandInteraction,
   message: string,
