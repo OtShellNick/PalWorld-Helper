@@ -42,6 +42,7 @@ export enum ERRORS {
 
 export enum SUCCESS_MESSAGES {
   SEND_MESSAGE_SUCCESS = 'Сообщение успешно отправлено',
+  NO_PLAYERS_FOUND = 'Нет игроков в сети',
 }
 
 export enum COMMANDS_NAMES {

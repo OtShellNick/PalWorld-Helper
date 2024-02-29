@@ -28,10 +28,10 @@ interface PlayerInfo {
 }
 
 function parsePlayerData(input: string): PlayerInfo[] {
-  console.log(input);
   return input
     .split('\n')
     .slice(1)
+    .filter((item) => item !== '')
     .map((item) => {
       const [name, playeruid, steamid] = item.split(',');
       return {
