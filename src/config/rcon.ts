@@ -3,6 +3,7 @@ import { randomInt } from 'crypto';
 import { Buffer } from 'node:buffer';
 import { TBaseRecord } from '#types';
 import { configDotenv } from 'dotenv';
+import { bufferController } from '#helpers';
 
 configDotenv();
 
@@ -34,10 +35,12 @@ class PalRCONClient {
   }
 
   private async connect() {
+    console.log('Connecting...');
     return new Promise((resolve, reject) => {
       this.socket = net.createConnection(this.options.port, this.options.host);
       this.socket.once('error', () => reject(new Error('Connection error')));
       this.socket.once('connect', () => {
+        console.log('Connected!');
         this.connected = true;
         this.id = randomInt(2147483647);
         this.sendRawCommand(this.options.password, 3)
@@ -46,6 +49,7 @@ class PalRCONClient {
               const receivedId = response.readUInt32LE(4);
               if (receivedId === this.id) {
                 this.authed = true;
+                console.log('Authenticated!');
                 resolve(null);
               } else {
                 this.disconnect();
@@ -66,41 +70,56 @@ class PalRCONClient {
   }
 
   async sendRawCommand(data: string, requestId: number): Promise<Buffer> {
+    if (!this.connected) {
+      throw new Error(
+        `Authentication Error: ${this.options.host}:${this.options.port}`,
+      );
+    }
+
+    const buffer = bufferController(data, this.id, requestId);
+
     return new Promise((resolve, reject) => {
-      if (!this.connected)
-        reject(
-          new Error(
-            `Authentication Error: ${this.options.host}:${this.options.port}`,
-          ),
-        );
-
-      const len = Buffer.byteLength(data, 'ascii');
-      const buffer = Buffer.alloc(len + 14);
-      buffer.writeInt32LE(len + 4, 0);
-      buffer.writeInt32LE(this.id, 4);
-      buffer.writeInt32LE(requestId, 8);
-      buffer.write(data, 12, 'ascii');
-      buffer.writeInt16LE(0, 12 + len);
-      this.socket.write(buffer);
-
       let responseData = Buffer.alloc(0);
 
       const onData = (dataChunk: Uint8Array) => {
-        responseData = Buffer.concat([responseData, dataChunk]);
+        // Сконкатенировать полученные данные
+        responseData = Buffer.concat([responseData, Buffer.from(dataChunk)]);
+
+        // Проверить, достаточно ли данных для чтения предполагаемой длины ответа
+        if (responseData.length < 4) {
+          // Недостаточно данных для определения длины ответа
+          return;
+        }
+
+        // Читаем длину ответа из первых 4 байтов responseData
         const responseLength = responseData.readUInt32LE(0);
 
-        if (responseLength > 0 && responseData.length >= responseLength) {
+        console.log(
+          'Response length:',
+          responseLength,
+          'Response Data Length:',
+          responseData.length,
+        );
+        // Проверить, получен ли полный ответ
+        if (responseData.length >= responseLength + 4) {
+          // Полный ответ получен, убрать слушатели и разрешить промис
           this.socket.removeListener('data', onData);
+          this.socket.removeListener('error', onError);
+
+          // Получить полный ответ, не включая 4 байта длины
+          const fullResponse = responseData.slice(4, responseLength + 4);
           resolve(responseData);
         }
       };
-
-      this.socket.on('data', onData);
-
-      this.socket.once('error', (error) => {
+      const onError = (error: Error) => {
         this.socket.removeListener('data', onData);
         reject(error);
-      });
+      };
+
+      this.socket.write(buffer);
+      this.socket.on('data', onData);
+
+      this.socket.once('error', onError);
     });
   }
 
@@ -274,6 +293,7 @@ class PalRCONClient {
   }
 
   disconnect() {
+    console.log('Disconnecting...');
     this.connected = false;
     this.authed = false;
     this.socket.end();

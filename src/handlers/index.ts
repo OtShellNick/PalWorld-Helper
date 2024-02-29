@@ -1,6 +1,7 @@
 import { CommandInteraction } from 'discord.js';
 import { PalRCONClient } from '#config/rcon.ts';
 import { ERRORS, SUCCESS_MESSAGES } from '#const';
+import { sendPlayerInfo } from '../helpers/index.js';
 
 const rcon = new PalRCONClient();
 
@@ -15,8 +16,11 @@ export const playersHandler = async (
 ): Promise<void> => {
   try {
     const resp = await rcon.ShowPlayers();
-    await interaction.reply(resp);
+    console.log(resp);
+    const embeds = sendPlayerInfo(resp);
+    await interaction.reply({ embeds });
   } catch (error) {
+    console.log(error);
     await interaction.reply(ERRORS.SHOW_PLAYERS_ERROR);
   }
 };
